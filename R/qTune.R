@@ -84,14 +84,14 @@ qTune <- function(sce, qs=seq(3, 7), burn.in=100, nrep=1000, ...) {
     
     ## Get neighbors
     platform <- ifelse(is.null(args$platform), "Visium", args$platform)
-    df_j <- .find_neighbors(sce, platform)
+    df_j <- .find_neighbors(sce, platform, args$k)
     
     ## Parse args from ... for cluster initialization
     init.args <- c("init", "init.method")
     init.args <- compact(args[init.args])
     
     ## Parse args from ... for BayesSpace clustering
-    cluster.args <- discard(names(args), function(x) {x %in% c(c("use.dimred", "d", "platform"), names(init.args))})
+    cluster.args <- discard(names(args), function(x) {x %in% c(c("use.dimred", "d", "platform", "k"), names(init.args))})
     cluster.args <- compact(args[cluster.args])
     cluster.args$nrep <- nrep
     
