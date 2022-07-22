@@ -112,7 +112,7 @@ cluster <- function(Y, q, df_j, init = rep(1, nrow(Y)),
 #' @export
 #' @rdname spatialCluster
 spatialCluster <- function(sce, q, use.dimred = "PCA", d = 15,
-    platform=c("Visium", "ST"),
+    platform=c("Visium", "ST", "others"), k = 10,
     init = NULL, init.method = c("mclust", "kmeans"),
     model = c("t", "normal"), precision = c("equal", "variable"), 
     nrep = 50000, burn.in=1000, gamma = NULL, mu0 = NULL, lambda0 = NULL,
@@ -141,7 +141,7 @@ spatialCluster <- function(sce, q, use.dimred = "PCA", d = 15,
     }
 
     ## Get indices of neighboring spots, and initialize cluster assignments
-    df_j <- .find_neighbors(sce, platform)
+    df_j <- .find_neighbors(sce, platform, k)
     init <- .init_cluster(Y, q, init, init.method)
     
     ## Set model parameters
@@ -155,6 +155,9 @@ spatialCluster <- function(sce, q, use.dimred = "PCA", d = 15,
         if (platform == "Visium") {
             gamma <- 3
         } else if (platform == "ST") {
+            gamma <- 2
+        } else if (platform == "others") {
+            warning('Platform and gamma not specified, using gamma = 2')
             gamma <- 2
         }
     }
@@ -194,11 +197,12 @@ spatialCluster <- function(sce, q, use.dimred = "PCA", d = 15,
 #' @param sce SingleCellExperiment
 #' @param platform If "Visium", select six neighboring spots around center; if
 #'   "ST", select four adjacent spots.
+#' @param k If "others", use k nearest neighbors
 #' @return \code{df_j} a list of neighbor indices (zero-indexed) for each spot
 #' 
 #' @keywords internal
 #' @importFrom purrr keep discard map
-.find_neighbors <- function(sce, platform) {
+.find_neighbors <- function(sce, platform, k) {
     if (platform == "Visium") {
         ## Spots to left and right, two above, two below
         offsets <- data.frame(x.offset=c(-2, 2, -1,  1, -1, 1),
@@ -207,7 +211,14 @@ spatialCluster <- function(sce, q, use.dimred = "PCA", d = 15,
         ## L1 radius of 1 (spots above, right, below, and left)
         offsets <- data.frame(x.offset=c( 0, 1, 0, -1),
                               y.offset=c(-1, 0, 1,  0))
-    } else {
+    } else if (platform == "others") {
+        spot.positions <- colData(sce)[, c("col", "row")]
+        knn <- dbscan::kNN(spot.positions, k = k)$id - 1
+        df_j <- split(knn, seq(nrow(knn)))
+        names(df_j) <- NULL
+        return(df_j)
+    }
+      else {
         stop(".find_neighbors: Unsupported platform \"", platform, "\".")
     }
     

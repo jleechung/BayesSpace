@@ -36,9 +36,10 @@ Imports:
     ggplot2,
     scales,
     BiocFileCache,
-    BiocSingular
+    BiocSingular,
+    dbscan
 License: MIT + file LICENSE
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.0
 LinkingTo: 
     Rcpp,
     RcppArmadillo,

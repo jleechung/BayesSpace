@@ -4,13 +4,15 @@
 \alias{.find_neighbors}
 \title{Find neighboring spots based on array coordinates}
 \usage{
-.find_neighbors(sce, platform)
+.find_neighbors(sce, platform, k)
 }
 \arguments{
 \item{sce}{SingleCellExperiment}
 
 \item{platform}{If "Visium", select six neighboring spots around center; if
 "ST", select four adjacent spots.}
+
+\item{k}{If "others", use k nearest neighbors}
 }
 \value{
 \code{df_j} a list of neighbor indices (zero-indexed) for each spot

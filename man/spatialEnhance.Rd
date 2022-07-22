@@ -76,7 +76,7 @@ is rounded down to the nearest multiple of 100.}
 \item{jitter_scale}{Controls the amount of jittering. Small amounts of 
 jittering are more likely to be accepted but result in exploring the space
 more slowly. We suggest tuning \code{jitter_scale} so that Ychange is on 
-average around 25\%-40\%.}
+average around 25\%-40\%. Ychange can be accessed via \code{mcmcChain()}.}
 
 \item{jitter_prior}{Scale factor for the prior variance, parameterized as the
 proportion (default = 0.3) of the mean variance of the PCs.
